@@ -1,0 +1,176 @@
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%% FATTI %%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+carta(1,"FIORI", 1).
+carta(2, "QUADRI", 1).
+carta(3, "CUORI", 1).
+carta(4, "PICCHE" , 1).
+           
+carta(5, "FIORI", 2).
+carta(6, "QUADRI", 2).
+carta(7, "CUORI", 2).
+carta(8, "PICCHE" , 2).
+
+carta(9, "FIORI", 3).
+carta(10, "QUADRI", 3).
+carta(11, "CUORI", 3).
+carta(12, "PICCHE" , 3).
+
+carta(13, "FIORI", 4).
+carta(14, "QUADRI", 4).
+carta(15, "CUORI", 4).
+carta(16, "PICCHE" , 4).
+
+carta(17, "FIORI", 5).
+carta(18, "QUADRI", 5).
+carta(19, "CUORI", 5).
+carta(20, "PICCHE" , 5).
+
+carta(21, "FIORI", 6).
+carta(22, "QUADRI", 6).
+carta(23, "CUORI", 6).
+carta(24, "PICCHE" , 6).
+
+carta(25, "FIORI", 7).
+carta(26, "QUADRI", 7).
+carta(27, "CUORI", 7).
+carta(28, "PICCHE" , 7).
+
+carta(29, "FIORI", 8).
+carta(30, "QUADRI", 8).
+carta(31, "CUORI", 8).
+carta(32, "PICCHE" , 8).
+
+carta(33, "FIORI", 9).
+carta(34, "QUADRI", 9).
+carta(35, "CUORI", 9).
+carta(36, "PICCHE" , 9).
+
+carta(37, "FIORI", 10).
+carta(38, "QUADRI", 10).
+carta(39, "CUORI", 10).
+carta(40, "PICCHE" , 10).
+
+carta(41, "FIORI", 11).
+carta(42, "QUADRI", 11).
+carta(43, "CUORI", 11).
+carta(44, "PICCHE" , 11).
+
+carta(45, "FIORI", 12).
+carta(46, "QUADRI", 12).
+carta(47, "CUORI", 12).
+carta(48, "PICCHE" , 12).
+
+carta(49, "FIORI", 13).
+carta(50, "QUADRI", 13).
+carta(51, "CUORI", 13).
+carta(52, "PICCHE" , 13).
+
+
+
+% IdCarta - IdCellaDiScarto - IdCellaFinale - IdColonna - posizioneCarta - IdCella - Seme
+
+% spostaInColonna(IdCarta, IdColonna)
+% spostaInScarto(IdCarta, IdCella)
+% spostaInFinale(IdCarta, IdCellaFinale)
+% muoviDaCellaDiScartoAColonna(IdCellaDiScarto, IdColonna)
+% muoviDaCellaDiScartoAFinale(IdCarta, IdCellaFinale)
+
+% spostabileDaScartoAColonna(IdCellaDiScarto, IdColonna)
+% spostabileDaScartoAFinale(IdCarta, IdCellaFinale)
+% spostabileInColonna(IdCarta, IdColonna)
+% spostabileInFinale(IdCarta, IdCellaFinale)
+% spostabileInScarto(IdCarta)
+
+% cellaDiScarto(IdCarta, IdCellaDiScarto)
+% colonna(IdCarta, posizioneCarta, IdColonna)
+% cellaFinale(IdCarta, seme, IdCella)
+% prossimaInScala(IdCarta)
+% faParteDiUnaScala(IdCarta)
+% cellaDiScarto(IdCarta, IdCellaDiScarto)
+% mossa(IdCarta, IdDestinazione)
+% scala(IdCarta)
+% carta(IdCarta, Seme, Valore)
+% colonnaConProssimaFinale(IdColonna, IdCarta1)
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%% GUESS %%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+spostaInFinale(IdCarta, IdCellaFinale) | nonSpostaInFinale(IdCarta, IdCellaFinale) :- spostabileInFinale(IdCarta, IdCellaFinale).
+spostaInColonna(IdCarta, IdColonna) | nonSpostaInColonna(IdCarta, IdColonna) :- spostabileInColonna(IdCarta, IdColonna).
+spostaInScarto(IdCarta1, IdCellaDiScarto) | nonSpostaInScarto(IdCarta1, IdCellaDiScarto) :- spostabileInScarto(IdCarta1), cellaDiScarto(IdCarta, IdCellaDiScarto), IdCarta = 53.
+
+muoviDaCellaDiScartoAColonna(IdCellaDiScarto, IdColonna) | nonMuoviDaCellaDiScartoAColonna(IdCellaDiScarto, IdColonna) :- spostabileDaScartoAColonna(IdCellaDiScarto, IdColonna).
+muoviDaCellaDiScartoAFinale(IdCarta, IdCellaFinale) | nonMuoviDaCellaDiScartoAFinale(IdCarta, IdCellaFinale) :- spostabileDaScartoAFinale(IdCarta, IdCellaFinale).
+
+% Tutte le mosse possibili
+mossa(IdCarta, IdCellaFinale) :- spostaInFinale(IdCarta, IdCellaFinale).
+mossa(IdCarta, IdColonna) :- spostaInColonna(IdCarta, IdColonna).
+mossa(IdCarta, IdCellaDiScarto) :- spostaInScarto(IdCarta, IdCellaDiScarto).
+mossa(IdCarta, IdColonna) :- muoviDaCellaDiScartoAColonna(IdCarta, IdColonna).
+mossa(IdCarta, IdCellaFinale) :- muoviDaCellaDiScartoAFinale(IdCarta, IdCellaFinale).
+
+% Ricaviamo le scale già formate nelle colonne
+% IdCartaIniziale = id della carta più alta, quella che inizia la scala
+% IdCartaFinale = id della carta più bassa, quella che termina la scala
+scala(IdCarta) :- colonna(IdCarta, Posizione, IdColonna), colonna(IdCarta2, Posizione2, IdColonna), carta(IdCarta, _, Valore), carta(IdCarta2, _, Valore2), colore(IdCarta, Colore), colore(IdCarta2, Colore2), Colore!=Colore2, Posizione=Posizione2-1,Valore=Valore2+1.
+
+% Colori utili per trovare le scale
+colore(IdCarta, "ROSSO") :- carta(IdCarta, "QUADRI", _).
+colore(IdCarta, "ROSSO") :- carta(IdCarta, "CUORI", _).
+colore(IdCarta, "NERO") :- carta(IdCarta, "PICCHE", _).
+colore(IdCarta, "NERO") :- carta(IdCarta, "FIORI", _).
+
+% Rilevo le colonne vuote per evitare spostamenti stupidi
+colonnaNonVuota(IdColonna) :- colonna(_, _, IdColonna).
+% Rilevo le celle di scarto vuote per evitare spostamenti stupidi
+cellaDiScartoVuota(IdCellaDiScarto) :- cellaDiScarto(53, IdCellaDiScarto).
+
+% Rilevo le colonne con assi
+colonnaConAsso(IdColonna) :- colonna(IdCarta, _, IdColonna),  carta(IdCarta, _, 1).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%% CONSTRAINT %%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Non è possibile che venga fatta più di una mossa
+:- #count{ IdCarta, IdDestinazione : mossa(IdCarta, IdDestinazione) } > 1.
+:- #count{ IdCarta, IdDestinazione : mossa(IdCarta, IdDestinazione) } < 1.
+
+% Non è possibile che se posso mettere una carta in finale, faccio altro
+:- spostabileInFinale(_, _), spostaInColonna(_, _).
+:- spostabileInFinale(_, _), spostaInScarto(_, _).
+:- spostabileInFinale(_, _), muoviDaCellaDiScartoAColonna(_, _).
+
+:- spostabileDaScartoAFinale(_, _), spostaInColonna(_, _).
+:- spostabileDaScartoAFinale(_, _), spostaInScarto(_, _).
+:- spostabileDaScartoAFinale(_, _), muoviDaCellaDiScartoAColonna(_, _).
+
+% Non è possibile(perché è una mossa stupida) che una carta venga spostata da una colonna con solo quella carta in una colonna vuota
+:- not colonnaNonVuota(IdColonna), spostaInColonna(IdCarta, IdColonna), colonna(IdCarta, Posizione, _), Posizione=0.
+
+% Non è possibile(perché è una mossa stupida) che una carta venga spostata da una colonna con solo quella carta in una cella di scarto
+% :- cellaDiScartoVuota(IdCellaDiScarto), spostaInScarto(IdCarta, IdCellaDiScarto), colonna(IdCarta, Posizione, _), Posizione=0.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%% WEAK CONSTRAINT %%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+:~ spostabileInColonna(IdCarta, IdColonna2), colonna(IdCarta, _, IdColonna1), colonnaConAsso(IdColonna1), nonSpostaInColonna(IdCarta, IdColonna2). [1:6]
+
+:~ spostabileInColonna(IdCarta, IdColonna2), colonnaConAsso(IdColonna2), spostaInColonna(IdCarta, IdColonna2). [5:6]
+
+:~ spostabileDaScartoAColonna(IdCellaDiScarto, IdColonna), nonMuoviDaCellaDiScartoAColonna(IdCellaDiScarto, IdColonna). [6:6]
+
+:~ spostabileInColonna(IdCarta, IdColonna), spostaInScarto(IdCarta, _). [7:6]
+
+:~ spostabileInScarto(IdCarta), colonna(IdCarta, _, IdColonna), colonnaConAsso(IdColonna), nonSpostaInScarto(IdCarta, IdCella). [10:5]
+
+:~ cellaDiScartoVuota(IdCellaDiScarto), colonna(IdCarta, Posizione, _), carta(IdCarta, _, Valore), spostaInScarto(IdCarta, IdCellaDiScarto), Posizione=0, Costo=13-Valore. [Costo:4]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%% FINE %%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
